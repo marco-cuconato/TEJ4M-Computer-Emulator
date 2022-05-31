@@ -32,7 +32,7 @@ def run_program(lines):
             # OUT
             case "1110":
                 print("Hello, World!")
-            #HLT
+            # HLT
             case "1111":
                 print("Hello, World!")
 
@@ -40,10 +40,9 @@ def run_program(lines):
 def startup():
     registers = [0 for x in range(8)]
 
-    with open('main.ebit') as file_content:
+    with open("main.ebit") as file_content:
         lines = file_content.readlines()
         run_program(lines)
-
 
 
 if __name__ == "__main__":
