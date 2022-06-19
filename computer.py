@@ -4,49 +4,55 @@
 # Created in May 2022
 # Code runner for 8-bit code
 
-import cpu
+import sys
+from cpu import CPU
 
 
-def run_program(lines):
-    computer = cpu.CPU
+def run_program(instructions_array):
+    cpu = CPU
 
-    for line in lines:
+    for line in instructions_array:
         match line[:4]:
-            # NOP
-            case computer.OpCodes.NOP:
+            case cpu.Opcode.NOP:
                 pass
-            # LDA
-            case computer.OpCodes.LDA:
-                computer.registers["IR"] = line[:4]
-                computer.registers["A"] = format(int(line[4:], 2), '#010b')
-                print(computer.registers["A"])
-            # ADD
-            case computer.OpCodes.ADD:
-                computer.registers["A"] = format(int(computer.registers["A"], 2) + int(line[4:], 2), '#010b')
-            # SUB
-            case computer.OpCodes.SUB:
+            case cpu.Opcode.LDA:
+                cpu.register["A"] = cpu.memory[cpu.register["IR"]]
+            case cpu.Opcode.ADD:
+                cpu.register["A"] = format(
+                    int(cpu.register["A"], 2) + int(line[4:], 2), "#010b"
+                )
+            case cpu.Opcode.SUB:
+                cpu.register["A"] = format(
+                    int(cpu.register["A"], 2) - int(line[4:], 2), "#010b"
+                )
+                print(cpu.register["A"])
+            case cpu.Opcode.STA:
                 print("Hello, World!")
-            # STA
-            case computer.OpCodes.STA:
+            case cpu.Opcode.LDI:
+                cpu.register["IR"] = line[:4]
+                cpu.register["A"] = format(int(line[4:], 2), "#010b")
+                print(cpu.register["A"])
+            case cpu.Opcode.JMP:
                 print("Hello, World!")
-            # LDI
-            case computer.OpCodes.LDI:
+            case cpu.Opcode.OUT:
                 print("Hello, World!")
-            # JMP
-            case computer.OpCodes.JMP:
-                print("Hello, World!")
-            # OUT
-            case computer.OpCodes.OUT:
-                print("Hello, World!")
-            # HLT
-            case computer.OpCodes.HLT:
-                print("Hello, World!")
+            case cpu.Opcode.HLT:
+                cpu.flag["HALT"] = True
+
+        if cpu.flag["HALT"]:
+            print("Stopping cpu...")
+            sys.exit()
 
 
 def startup():
-    with open("main.ebit", encoding="utf_8") as file_content:
-        lines = file_content.readlines()
-        run_program(lines)
+    try:
+        with open("main.ebit", encoding="utf_8") as file_content:
+            content_array = file_content.readlines()
+            file_content.close()
+            run_program(content_array)
+    except OSError:
+        print("Error: Unable to open file.")
+        sys.exit()
 
 
 if __name__ == "__main__":
