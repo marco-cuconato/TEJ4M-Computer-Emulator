@@ -27,7 +27,7 @@ class CPU:
     
     def load_program(self):
         try:
-            with open("main.ebit", encoding="utf_8") as file_content:
+            with open("main.bin", encoding="utf_8") as file_content:
                 instruction_array = file_content.readlines()
                 file_content.close()
                 self.execute_program(instruction_array)
@@ -89,7 +89,7 @@ class CPU:
                     self.DEBUG = not self.DEBUG
                     print(f"Debug is on: {self.DEBUG}")
                 elif operator == instructions["OUT"]:
-                    print(f"Value of \"A\" register: {self.A}")
+                    print(f"Output: Value of \"A\" register: {self.A}")
                 elif operator == instructions["HLT"]:
                     self.HALT = True
                 else:
