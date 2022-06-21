@@ -8,6 +8,12 @@ import sys
 
 
 class CPU:
+    """_CPU class handling all the CPU operations_
+
+    Raises:
+        ValueError: _Error checking if there is any issues with the user-inputted lines of code_
+    """
+
     def __init__(self):
         # RAM
         self.memory = [0] * 16
@@ -26,6 +32,7 @@ class CPU:
         self.flag_debug = False
 
     def load_program(self):
+        """_Opens the file and parses it into an array_"""
         try:
             with open("main.bin", encoding="utf_8") as file_content:
                 instruction_array = file_content.readlines()
@@ -36,7 +43,17 @@ class CPU:
             sys.exit()
 
     def execute_program(self, instruction_array):
-        instructions = {
+        """_Executes the program written in the opened file, line by line_
+
+        Args:
+            instruction_array (_dict[str, str]_): _Instructions from the opened file_
+
+        Raises:
+            ValueError: _description_
+        """
+        # Hard-coded instruction set, formatted to 6 characters, accounting
+        # for the python prefix of "0b", resulting in a 4 bit binary number
+        instruction_set = {
             "NOP": format(int("0000", 2), "#06b"),
             "LDA": format(int("0001", 2), "#06b"),
             "ADD": format(int("0010", 2), "#06b"),
@@ -49,55 +66,63 @@ class CPU:
             "HLT": format(int("1111", 2), "#06b"),
         }
 
+        # Iterating line by line of the given main.bin file.
         for line in instruction_array:
             self.program_counter += 1
             try:
                 operator = format(int(line[:4], 2), "#06b")
-                if operator == instructions["NOP"]:
+                if operator == instruction_set["NOP"]:
                     pass
-                elif operator == instructions["LDA"]:
+                elif operator == instruction_set["LDA"]:
                     # TODO
                     pass
-                elif operator == instructions["ADD"]:
-                    operand = format(int(line[4:], 2), "#06b")
+                elif operator == instruction_set["ADD"]:
+                    operand = format(int(line[4:9], 2), "#06b")
                     self.register_a = format(
                         int(self.register_a, 2) + int(operand, 2), "#06b"
                     )
                     if self.flag_debug:
                         print(
-                            f'Added "A" register with operand {operand}, equals to {self.register_a}.'
+                            'Added "A" register with operand {operand}, '
+                            + "equals to {self.register_a}."
                         )
                     self.flag_cf = int(self.register_a, 2) > 15
+                    if self.flag_cf:
+                        self.register_a = self.register_a[:3] + self.register_a[3:]
                     self.flag_zf = int(self.register_a, 2) == 0
-                elif operator == instructions["SUB"]:
-                    operand = format(int(line[4:], 2), "#06b")
+                elif operator == instruction_set["SUB"]:
+                    operand = format(int(line[4:9], 2), "#06b")
                     self.register_a = format(
                         int(self.register_a, 2) - int(operand, 2), "#06b"
                     )
                     if self.flag_debug:
                         print(
-                            f'Subtracted "A" register with operand {operand}, equals to {self.register_a}'
+                            'Subtracted "A" register with operand {operand}, '
+                            + "equals to {self.register_a}"
                         )
                     self.flag_cf = int(self.register_a, 2) < 0
                     self.flag_zf = int(self.register_a, 2) == 0
-                elif operator == instructions["STA"]:
+                elif operator == instruction_set["STA"]:
                     # TODO
                     pass
-                elif operator == instructions["LDI"]:
-                    operand = format(int(line[4:], 2), "#06b")
+                elif operator == instruction_set["LDI"]:
+                    # Set the register A to the operand
+                    operand = format(int(line[4:9], 2), "#06b")
                     self.register_a = operand
                     if self.flag_debug:
                         print(f'Updated "A" register to {operand}.')
-                elif operator == instructions["JMP"]:
+                elif operator == instruction_set["JMP"]:
                     # TODO
                     pass
-                elif operator == instructions["DEBUG"]:
+                elif operator == instruction_set["DEBUG"]:
                     # Toggle debug mode
                     self.flag_debug = not self.flag_debug
                     print(f"Debug is on: {self.flag_debug}")
-                elif operator == instructions["OUT"]:
+                elif operator == instruction_set["OUT"]:
+                    # Output register A to console
                     print(f'Output: Value of "A" register: {self.register_a}')
-                elif operator == instructions["HLT"]:
+                elif operator == instruction_set["HLT"]:
+                    # Halt the program
                     self.flag_halt = True
                 else:
                     print(f"Invalid opcode {operator}.")
