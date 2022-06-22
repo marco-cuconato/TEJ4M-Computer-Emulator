@@ -18,7 +18,7 @@ class CPU:
     def __init__(self):
         # RAM
         self.number_of_bytes = 16
-        self.memory = [0b00000000] * self.number_of_bytes
+        self.memory = ["00000000"] * self.number_of_bytes
         # Program Counter
         self.program_counter = 0b0000
 
@@ -43,16 +43,16 @@ class CPU:
 
             for line in range(self.number_of_bytes):
                 try:
-                    self.memory[line] = format(int(instruction_array[line][:8], 2), "#010b")
+                    self.memory[line] = instruction_array[line][:8]
                 except IndexError:
                     self.memory[line] = None
             print(f"Program in memory: {self.memory}")
-            self.execute_program(instruction_array)
+            self.execute_program()
         except OSError:
             print("Error: Unable to open file.")
             sys.exit()
 
-    def execute_program(self, instruction_array):
+    def execute_program(self):
         """_Executes the program written in the opened file, line by line_
 
         Args:
@@ -77,8 +77,8 @@ class CPU:
         }
 
         # Iterating line by line of the given main.bin file.
-        for line in instruction_array:
-            if line != None:
+        for line in self.memory:
+            if line is not None:
                 self.program_counter += 0b0001
                 try:
                     operator = format(int(line[:4], 2), "#06b")
