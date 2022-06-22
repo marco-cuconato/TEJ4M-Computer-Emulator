@@ -5,6 +5,7 @@
 # Code runner for 8-bit code
 
 import sys
+import time
 
 
 class CPU:
@@ -18,7 +19,7 @@ class CPU:
         # RAM
         self.memory = [0] * 16
         # Program Counter
-        self.program_counter = 0
+        self.program_counter = 0b0000
 
         # Registers
         self.register_a = 0b0000
@@ -37,6 +38,7 @@ class CPU:
             with open("main.bin", encoding="utf_8") as file_content:
                 instruction_array = file_content.readlines()
                 file_content.close()
+                print("Starting computer...")
                 self.execute_program(instruction_array)
         except OSError:
             print("Error: Unable to open file.")
@@ -68,37 +70,36 @@ class CPU:
 
         # Iterating line by line of the given main.bin file.
         for line in instruction_array:
-            self.program_counter += 1
+            self.program_counter += 0b0001
             try:
                 operator = format(int(line[:4], 2), "#06b")
+                operand = format(int(line[4:9], 2), "#06b")
                 if operator == instruction_set["NOP"]:
                     pass
                 elif operator == instruction_set["LDA"]:
                     # TODO
                     pass
                 elif operator == instruction_set["ADD"]:
-                    operand = format(int(line[4:9], 2), "#06b")
                     self.register_a = format(
                         int(self.register_a, 2) + int(operand, 2), "#06b"
                     )
                     if self.flag_debug:
                         print(
-                            'Added "A" register with operand {operand}, '
-                            + "equals to {self.register_a}."
+                            f'Added "A" register with operand {operand}, '
+                            + f"equals to {self.register_a}."
                         )
                     self.flag_cf = int(self.register_a, 2) > 15
                     if self.flag_cf:
                         self.register_a = self.register_a[:3] + self.register_a[3:]
                     self.flag_zf = int(self.register_a, 2) == 0
                 elif operator == instruction_set["SUB"]:
-                    operand = format(int(line[4:9], 2), "#06b")
                     self.register_a = format(
                         int(self.register_a, 2) - int(operand, 2), "#06b"
                     )
                     if self.flag_debug:
                         print(
-                            'Subtracted "A" register with operand {operand}, '
-                            + "equals to {self.register_a}"
+                            f'Subtracted "A" register with operand {operand}, '
+                            + f"equals to {self.register_a}"
                         )
                     self.flag_cf = int(self.register_a, 2) < 0
                     self.flag_zf = int(self.register_a, 2) == 0
@@ -107,7 +108,6 @@ class CPU:
                     pass
                 elif operator == instruction_set["LDI"]:
                     # Set the register A to the operand
-                    operand = format(int(line[4:9], 2), "#06b")
                     self.register_a = operand
                     if self.flag_debug:
                         print(f'Updated "A" register to {operand}.')
@@ -131,6 +131,11 @@ class CPU:
                 print(f"Error in line {self.program_counter}!")
                 self.flag_halt = True
 
+            if self.flag_halt:
+                print("Done. Halting Computer...")
+                sys.exit()
+            if self.flag_debug:
+                time.sleep(3)
             # If debug mode is on, and any of the flags are enabled, print a warning.
             if self.flag_cf and self.flag_debug:
                 print(f"Warning: Carry out detected in line {self.program_counter}.")
@@ -138,10 +143,6 @@ class CPU:
             elif self.flag_zf and self.flag_debug:
                 print(f"Warning: Zero value detected in line {self.program_counter}.")
                 self.flag_zf = False
-
-            if self.flag_halt:
-                print("Done. Halting Computer...")
-                sys.exit()
 
 
 if __name__ == "__main__":
