@@ -19,13 +19,12 @@ class CPU:
         # RAM
         self.number_of_bytes = 16
         self.memory = ["00000000"] * self.number_of_bytes
+
         # Program Counter
         self.program_counter = 0b0000
 
-        # Registers
+        # General register
         self.register_a = "0b0000"
-        self.register_b = "0b0000"
-        self.register_ir = "0b0000"
 
         # Flags
         self.flag_cf = False
