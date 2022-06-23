@@ -66,7 +66,6 @@ class CPU:
             "SUB": format(int("0011", 2), "#06b"),
             "STA": format(int("0100", 2), "#06b"),
             "LDI": format(int("0101", 2), "#06b"),
-            "JMP": format(int("0110", 2), "#06b"),
             "DEBUG": format(int("1001", 2), "#06b"),
             "OUT": format(int("1110", 2), "#06b"),
             "HLT": format(int("1111", 2), "#06b"),
@@ -120,9 +119,6 @@ class CPU:
                         self.register_a = operand
                         if self.flag_debug:
                             print(f'Updated "A" register to {operand}.')
-                    elif operator == instruction_set["JMP"]:
-                        # TODO
-                        pass
                     elif operator == instruction_set["DEBUG"]:
                         # Toggle debug mode
                         self.flag_debug = not self.flag_debug
