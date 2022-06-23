@@ -7,6 +7,8 @@
 import sys
 import time
 
+from tensorboard import program
+
 
 class CPU:
     """_CPU class handling all the CPU operations_
@@ -65,16 +67,14 @@ class CPU:
             "SUB": format(int("0011", 2), "#06b"),
             "STA": format(int("0100", 2), "#06b"),
             "LDI": format(int("0101", 2), "#06b"),
+            "JMP": format(int("0110", 2), "#06b"),
             "DEBUG": format(int("1001", 2), "#06b"),
             "OUT": format(int("1110", 2), "#06b"),
             "HLT": format(int("1111", 2), "#06b"),
         }
 
         # Iterating line by line of the given main.bin file.
-        for line in self.memory:
-            if self.flag_halt:
-                print("Done. Halting Computer...")
-                sys.exit()
+        while self.flag_halt is not True:
             if self.flag_debug:
                 time.sleep(3)
             # If debug mode is on, and any of the flags are enabled, print a warning.
@@ -85,10 +85,10 @@ class CPU:
                 print(f"Warning: Zero value detected in line {self.program_counter}.")
                 self.flag_zf = False
 
-            if line is not None:
+            if self.memory[self.program_counter] is not None:
                 try:
-                    operator = format(int(line[:4], 2), "#06b")
-                    operand = format(int(line[4:9], 2), "#06b")
+                    operator = format(int(self.memory[self.program_counter][:4], 2), "#06b")
+                    operand = format(int(self.memory[self.program_counter][4:9], 2), "#06b")
                     if operator == instruction_set["NOP"]:
                         pass
                     elif operator == instruction_set["LDA"]:
@@ -113,6 +113,8 @@ class CPU:
                         self.flag_zf = int(self.register_a, 2) == 0
                     elif operator == instruction_set["STA"]:
                         self.memory[int(operand, 2)] = f"0000{self.register_a[2:]}"
+                    elif operator == instruction_set["JMP"]:
+                        self.program_counter = int(operand, 2)
                     elif operator == instruction_set["LDI"]:
                         # Set the register A to the operand
                         self.register_a = operand
@@ -140,6 +142,9 @@ class CPU:
             else:
                 self.flag_debug = True
 
+            if self.flag_halt:
+                print("Done. Halting Computer...")
+                sys.exit()
             self.program_counter += 0b0001
 
 
