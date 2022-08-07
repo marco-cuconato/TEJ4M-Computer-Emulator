@@ -19,9 +19,6 @@ This is an emulator inspired by Ben Eater's breadboard CPU. It parses 8-bit inst
 | HLT         | 1111     |
 
 ## 8-bit instruction:
-A valid instruction is 8 bits: 4 bit operator + 4 bit operand.
-An operand can be any 4 bit binary number.
-
-Any characters after 8 bits is considered a comment.
+A valid instruction is 8 bits: 4 bit operator + 4 bit operand. An operand can be any 4 bit binary number. Any characters after 8 bits is considered a comment.
 
 Due to the artificial limitation of 16 bytes of "RAM", you can only write 16 lines of binary code.
